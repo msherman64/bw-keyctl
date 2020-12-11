@@ -1,0 +1,25 @@
+#! /bin/sh
+
+#wrapper around bitwarden command line client using keyctl
+#from https://github.com/bitwarden/cli/issues/65
+
+#see also:  https://github.com/jdukes/pykeyctl/
+#           https://github.com/xPMo/bwutil
+
+#Case 1: Key exists in keyring, key read succeeds, and key unlocks bw
+#       then execute bw command with session key from keyring
+k_id=$(keyctl request user bw_session) && \
+    k_val=$(keyctl pipe "$k_id") && \
+    BW_SESSION=$k_val bw unlock --check && \
+    BW_SESSION=$k_val exec bw "$@"
+
+#Case 2: Key does not exist in keyring, but bw unlock succeeds
+#       then, add bw session key to keyring
+#       then, execute bw command with session key
+if k_val=$(bw unlock --raw); then
+    k_id=$(keyctl add user bw_session "$k_val" @u)
+    BW_SESSION=$k_val exec bw "$@"
+fi
+
+#Case 3: bw unlock does not succeed, pass straigt to bw
+exec bw "$@"
