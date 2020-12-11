@@ -1,10 +1,10 @@
 #! /bin/sh
 
 #wrapper around bitwarden command line client using keyctl
-#from https://github.com/bitwarden/cli/issues/65
+#modified from https://github.com/bitwarden/cli/issues/65#issuecomment-683385208 by xPMo
 
 #see also:  https://github.com/jdukes/pykeyctl/
-#           https://github.com/xPMo/bwutil
+#           https://github.com/xPMo/bwutil (zsh only as of 12/11/2020)
 
 #Case 1: Key exists in keyring, key read succeeds, and key unlocks bw
 #       then execute bw command with session key from keyring
