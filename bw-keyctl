@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/sh
 
 #wrapper around bitwarden command line client using keyctl
 #modified from https://github.com/bitwarden/cli/issues/65#issuecomment-683385208 by xPMo
@@ -8,16 +8,19 @@
 
 #Case 1: Key exists in keyring, key read succeeds, and key unlocks bw
 #       then execute bw command with session key from keyring
+
+t_sec=1800 #set timeout to 30 minutes
+
 k_id=$(keyctl request user bw_session) && \
     k_val=$(keyctl pipe "$k_id") && \
     BW_SESSION=$k_val bw unlock --check && \
     BW_SESSION=$k_val exec bw "$@"
 
 #Case 2: Key does not exist in keyring, but bw unlock succeeds
-#       then, add bw session key to keyring
+#       then, add bw session key to keyring, with timeout
 #       then, execute bw command with session key
 if k_val=$(bw unlock --raw); then
-    k_id=$(keyctl add user bw_session "$k_val" @u)
+    k_id=$(keyctl add user bw_session "$k_val" @u) && $(keyctl timeout $k_id $t_sec)
     BW_SESSION=$k_val exec bw "$@"
 fi
 

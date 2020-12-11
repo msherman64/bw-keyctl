@@ -19,3 +19,8 @@ e.g. does not exist, is not readable, or is not correct to unlock the vault,
 then let the user unlock the vault, and use the new session key to both update the keyring, and run the bw command.
 
 If unlocking fails, then pass directly to bw, as the user most likely needs to log in, or change api keys, or similar.
+
+
+You can view the remaining timeout with `cat /proc/keys`
+
+To turn off the timeout, set `t_sec=0`
